@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[David Heidt's Blog]]></title>
-  <link href="http://witscher.github.com/atom.xml" rel="self"/>
+  <title><![CDATA[Category: icinga | David Heidt's Blog]]></title>
+  <link href="http://witscher.github.com/blog/categories/icinga/atom.xml" rel="self"/>
   <link href="http://witscher.github.com/"/>
   <updated>2012-07-18T11:52:51+02:00</updated>
   <id>http://witscher.github.com/</id>
@@ -20,12 +20,12 @@
     <id>http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin</id>
     <content type="html"><![CDATA[<p>This is actually so easy and painless, I had to write this down:</p>
 
-<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let&#8217;s do it:</p>
+<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let's do it:</p>
 
 <pre><code>aptitude install icinga pnp4nagios
 </code></pre>
 
-<p>and follow debconf&#8217;s instructions</p>
+<p>and follow debconf's instructions</p>
 
 <p>In /etc/icinga/icinga.cfg change the following variable</p>
 
@@ -55,7 +55,7 @@ and add:</p>
 <pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$&amp;srv=$SERVICEDESC$
 </code></pre>
 
-<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the &#8220;nagios3&#8221; directory to &#8220;icinga&#8221;:</p>
+<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the "nagios3" directory to "icinga":</p>
 
 <pre><code>AuthUserFile /etc/icinga/htpasswd.users
 </code></pre>
@@ -69,7 +69,7 @@ and add:</p>
 
 <p>login to http://hostname/icinga with user icingaadmin and the password you specified. enjoy icinga with pnp4nagios!</p>
 
-<p>One last hint: If you&#8217;re still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
+<p>One last hint: If you're still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
 ]]></content>
   </entry>
   

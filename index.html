@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://witscher.github.com/">
+  <link rel="canonical" href="http://blog.heidt.biz/">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -61,7 +61,7 @@
   
 <form action="http://google.com/search" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:witscher.github.com" />
+    <input type="hidden" name="q" value="site:blog.heidt.biz" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
@@ -110,15 +110,17 @@
 
   <div class="entry-content"><p>Recently we made up a new rails webapp using the <a href="http://pusher.com/docs/pusher_protocol">pusher protocol</a> in combination with <a href="https://github.com/stevegraham/slanger">Slanger</a> as websocket server.</p>
 
-<p>The site needed to support both, plain http and encrypted https, so I decided to start slanger without ssl options and put a ssl terminating proxy to handle the wss:// URIs</p>
+<p>The site needed to support both, plain http and encrypted https, so I decided to start slanger in standard mode (no ssl) and put a ssl-terminating proxy in front to handle the wss:// URIs</p>
 
-<p>There were rumors that <a href="http://www.apsis.ch/pound/">pound</a> was capable of proxying TCP requests. I know pound for a long time and did not manage to get it working. However, <a href="http://www.stunnel.org/">stunnel</a> offered a solid working solution:</p>
+<p>There were rumors that <a href="http://www.apsis.ch/pound/">pound</a> was capable of proxying TCP requests. I work with pound for quite a long time and did not manage to get it working. However, <a href="http://www.stunnel.org/">stunnel</a> offered a fast and solid  solution:</p>
 
 <p>The code snippets apply to Ubuntu 10.04, but this should work on other environments, too.
 I installed stunnel with</p>
 
 <pre><code># aptitude install stunnel4
 </code></pre>
+
+<p>and ended up with this configuration:</p>
 
 <figure class='code'><figcaption><span>/etc/stunnel/stunnel.conf  </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -184,7 +186,7 @@ I installed stunnel with</p>
 
 <p>If you can spare an extra server or an additional IP Address for your websocket server, it may be better to use the standard ports 80 and 443.</p>
 
-<p>Possible pitfall: make sure, the hostname (don&#8217;t use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently.</p>
+<p>Possible pitfall: make sure, the hostname (don&#8217;t use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently when connecting to secure websocket URIs (wss://example.com/).</p>
 </div>
   
   

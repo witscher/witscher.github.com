@@ -2,22 +2,20 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>
-            http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/
+            http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/
         </loc>
         <lastmod>2012-07-18T11:36:31+02:00</lastmod>
     </url>
     <url>
-        <loc>
-            http://witscher.github.com/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/
-        </loc>
-        <lastmod>2012-07-19T14:45:44+02:00</lastmod>
+        <loc>http://blog.heidt.biz/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/</loc>
+        <lastmod>2012-07-19T17:20:54+02:00</lastmod>
     </url>
     <url>
-        <loc>http://witscher.github.com/blog/archives/</loc>
-        <lastmod>2012-07-19T14:45:44+02:00</lastmod>
+        <loc>http://blog.heidt.biz/blog/archives/</loc>
+        <lastmod>2012-07-19T17:20:54+02:00</lastmod>
     </url>
     <url>
-        <loc>http://witscher.github.com/</loc>
-        <lastmod>2012-07-19T14:45:44+02:00</lastmod>
+        <loc>http://blog.heidt.biz/</loc>
+        <lastmod>2012-07-19T17:20:54+02:00</lastmod>
     </url>
 </urlset>

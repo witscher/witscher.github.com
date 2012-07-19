@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: pnp4nagios | David Heidt's Blog]]></title>
-  <link href="http://witscher.github.com/blog/categories/pnp4nagios/atom.xml" rel="self"/>
-  <link href="http://witscher.github.com/"/>
-  <updated>2012-07-19T14:45:45+02:00</updated>
-  <id>http://witscher.github.com/</id>
+  <link href="http://blog.heidt.biz/blog/categories/pnp4nagios/atom.xml" rel="self"/>
+  <link href="http://blog.heidt.biz/"/>
+  <updated>2012-07-19T17:21:01+02:00</updated>
+  <id>http://blog.heidt.biz/</id>
   <author>
     <name><![CDATA[David Heidt]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin)]]></title>
-    <link href="http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/"/>
+    <link href="http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/"/>
     <updated>2012-06-19T11:30:00+02:00</updated>
-    <id>http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin</id>
+    <id>http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin</id>
     <content type="html"><![CDATA[<p>This is actually so easy and painless, I had to write this down:</p>
 
 <p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let's do it:</p>

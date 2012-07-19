@@ -9,7 +9,7 @@
   <meta name="author" content="David Heidt">
 
   
-  <meta name="description" content="This is actually so easy and painless, I had to write this down: I presume installing apache2 is no problem for you. This short tutorial covers a &hellip;">
+  <meta name="description" content="Recently we made up a new rails webapp using the pusher protocol in combination with Slanger as websocket server. The site needed to support both, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +77,120 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/">Ssl Websocket Proxy With Stunnel Howto</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-19T14:01:00+02:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently we made up a new rails webapp using the <a href="http://pusher.com/docs/pusher_protocol">pusher protocol</a> in combination with <a href="https://github.com/stevegraham/slanger">Slanger</a> as websocket server.</p>
+
+<p>The site needed to support both, plain http and encrypted https, so I decided to start slanger without ssl options and put a ssl terminating proxy to handle the wss:// URIs</p>
+
+<p>There were rumors that <a href="http://www.apsis.ch/pound/">pound</a> was capable of proxying TCP requests. I know pound for a long time and did not manage to get it working. However, <a href="http://www.stunnel.org/">stunnel</a> offered a solid working solution:</p>
+
+<p>The code snippets apply to Ubuntu 10.04, but this should work on other environments, too.
+I installed stunnel with</p>
+
+<pre><code># aptitude install stunnel4
+</code></pre>
+
+<figure class='code'><figcaption><span>/etc/stunnel/stunnel.conf  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>; Certificate/key is needed in server mode and optional in client mode
+</span><span class='line'><span class="nv">cert</span> <span class="o">=</span> /path/to/cert-or-cert-chain.pem
+</span><span class='line'><span class="nv">key</span> <span class="o">=</span> /path/to/private.key
+</span><span class='line'>
+</span><span class='line'>; Protocol version <span class="o">(</span>all, SSLv2, SSLv3, TLSv1<span class="o">)</span>
+</span><span class='line'><span class="nv">sslVersion</span> <span class="o">=</span> all
+</span><span class='line'>; no, we don<span class="err">&#39;</span>t want SSLv2
+</span><span class='line'><span class="nv">options</span> <span class="o">=</span> NO_SSLv2
+</span><span class='line'>; Some extra strong ciphers
+</span><span class='line'><span class="nv">ciphers</span> <span class="o">=</span> ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM
+</span><span class='line'>
+</span><span class='line'>; Some security enhancements <span class="k">for </span>UNIX systems - comment them out on Win32
+</span><span class='line'><span class="nv">chroot</span> <span class="o">=</span> /var/lib/stunnel4/
+</span><span class='line'><span class="nv">setuid</span> <span class="o">=</span> stunnel4
+</span><span class='line'><span class="nv">setgid</span> <span class="o">=</span> stunnel4
+</span><span class='line'>; PID is created inside the chroot jail
+</span><span class='line'><span class="nv">pid</span> <span class="o">=</span> /stunnel4.pid
+</span><span class='line'>
+</span><span class='line'>; Some performance tunings
+</span><span class='line'><span class="nv">socket</span> <span class="o">=</span> l:TCP_NODELAY<span class="o">=</span>1
+</span><span class='line'><span class="nv">socket</span> <span class="o">=</span> r:TCP_NODELAY<span class="o">=</span>1
+</span><span class='line'>;<span class="nv">compression</span> <span class="o">=</span> zlib
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>https<span class="o">]</span>
+</span><span class='line'><span class="nv">accept</span>  <span class="o">=</span> &lt;your public IP&gt;:8443
+</span><span class='line'>
+</span><span class='line'>; slanger server listens on port 8080
+</span><span class='line'><span class="nv">connect</span> <span class="o">=</span> &lt;public or <span class="nb">local </span>IP&gt;:8080
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you can spare an extra server or an additional IP Address for your websocket server, it may be better to use the standard ports 80 and 443.</p>
+
+<p>Possible pitfall: make sure, the hostname (don&#8217;t use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -180,6 +294,10 @@ and add:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/">ssl websocket proxy with stunnel howto</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/">installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin)</a>
       </li>
     
@@ -259,7 +377,7 @@ and add:</p>
   
 
 <script type="text/javascript">
-      var disqus_shortname = 'davidheidt';
+      var disqus_shortname = 'davidheidtsblog';
       
         
         var disqus_script = 'count.js';

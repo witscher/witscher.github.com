@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[David Heidt's Blog]]></title>
-  <link href="http://witscher.github.com/atom.xml" rel="self"/>
+  <title><![CDATA[Category: howtos | David Heidt's Blog]]></title>
+  <link href="http://witscher.github.com/blog/categories/howtos/atom.xml" rel="self"/>
   <link href="http://witscher.github.com/"/>
   <updated>2012-07-19T14:45:45+02:00</updated>
   <id>http://witscher.github.com/</id>
@@ -30,7 +30,7 @@ I installed stunnel with</p>
 <pre><code># aptitude install stunnel4
 </code></pre>
 
-<figure class='code'><figcaption><span>/etc/stunnel/stunnel.conf  </span></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/etc/stunnel/stunnel.conf  </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -59,102 +59,39 @@ I installed stunnel with</p>
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
-<span class='line-number'>29</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>; Certificate/key is needed in server mode and optional in client mode
 </span><span class='line'><span class="nv">cert</span> <span class="o">=</span> /path/to/cert-or-cert-chain.pem
-</span><span class='line'><span class="nv">key</span> <span class="o">=</span> /path/to/private.key
+</span><span class='line'><span class="nv">key</span> <span class="o">=</span> /path/to/private.key&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>; Protocol version <span class="o">(</span>all, SSLv2, SSLv3, TLSv1<span class="o">)</span>
+</span><span class='line'>&lt;p&gt;; Protocol version <span class="o">(</span>all, SSLv2, SSLv3, TLSv1<span class="o">)</span>
 </span><span class='line'><span class="nv">sslVersion</span> <span class="o">=</span> all
 </span><span class='line'>; no, we don<span class="err">&#39;</span>t want SSLv2
 </span><span class='line'><span class="nv">options</span> <span class="o">=</span> NO_SSLv2
 </span><span class='line'>; Some extra strong ciphers
-</span><span class='line'><span class="nv">ciphers</span> <span class="o">=</span> ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM
+</span><span class='line'><span class="nv">ciphers</span> <span class="o">=</span> ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>; Some security enhancements <span class="k">for </span>UNIX systems - comment them out on Win32
+</span><span class='line'>&lt;p&gt;; Some security enhancements <span class="k">for </span>UNIX systems - comment them out on Win32
 </span><span class='line'><span class="nv">chroot</span> <span class="o">=</span> /var/lib/stunnel4/
 </span><span class='line'><span class="nv">setuid</span> <span class="o">=</span> stunnel4
 </span><span class='line'><span class="nv">setgid</span> <span class="o">=</span> stunnel4
 </span><span class='line'>; PID is created inside the chroot jail
-</span><span class='line'><span class="nv">pid</span> <span class="o">=</span> /stunnel4.pid
+</span><span class='line'><span class="nv">pid</span> <span class="o">=</span> /stunnel4.pid&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>; Some performance tunings
+</span><span class='line'>&lt;p&gt;; Some performance tunings
 </span><span class='line'><span class="nv">socket</span> <span class="o">=</span> l:TCP_NODELAY<span class="o">=</span>1
 </span><span class='line'><span class="nv">socket</span> <span class="o">=</span> r:TCP_NODELAY<span class="o">=</span>1
-</span><span class='line'>;<span class="nv">compression</span> <span class="o">=</span> zlib
+</span><span class='line'>;<span class="nv">compression</span> <span class="o">=</span> zlib&lt;/p&gt;
 </span><span class='line'>
+</span><span class='line'>&lt;p&gt;<span class="o">[</span>https<span class="o">]</span>
+</span><span class='line'><span class="nv">accept</span>  <span class="o">=</span> &lt;your public IP&gt;:8443&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'><span class="o">[</span>https<span class="o">]</span>
-</span><span class='line'><span class="nv">accept</span>  <span class="o">=</span> &lt;your public IP&gt;:8443
-</span><span class='line'>
-</span><span class='line'>; slanger server listens on port 8080
+</span><span class='line'>&lt;p&gt;; slanger server listens on port 8080
 </span><span class='line'><span class="nv">connect</span> <span class="o">=</span> &lt;public or <span class="nb">local </span>IP&gt;:8080
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>If you can spare an extra server or an additional IP Address for your websocket server, it may be better to use the standard ports 80 and 443.</p>
 
-<p>Possible pitfall: make sure, the hostname (don&#8217;t use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin)]]></title>
-    <link href="http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/"/>
-    <updated>2012-06-19T11:30:00+02:00</updated>
-    <id>http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin</id>
-    <content type="html"><![CDATA[<p>This is actually so easy and painless, I had to write this down:</p>
-
-<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let&#8217;s do it:</p>
-
-<pre><code>aptitude install icinga pnp4nagios
-</code></pre>
-
-<p>and follow debconf&#8217;s instructions</p>
-
-<p>In /etc/icinga/icinga.cfg change the following variable</p>
-
-<pre><code>process_performance_data=1
-</code></pre>
-
-<p>and set this one:</p>
-
-<pre><code>broker_module=/usr/lib/pnp4nagios/npcdmod.o config_file=/etc/pnp4nagios/npcd.cfg
-</code></pre>
-
-<p>Now, edit /etc/default/npcd and set</p>
-
-<pre><code>RUN="yes"
-</code></pre>
-
-<p>finally, enable the views in icingas standard templates:
-for hosts, edit /etc/icinga/objects/generic-host_icinga.cfg
-and add</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$
-</code></pre>
-
-<p>for services, edit /etc/icinga/objects/generic-service_icinga.cfg
-and add:</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$&amp;srv=$SERVICEDESC$
-</code></pre>
-
-<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the &#8220;nagios3&#8221; directory to &#8220;icinga&#8221;:</p>
-
-<pre><code>AuthUserFile /etc/icinga/htpasswd.users
-</code></pre>
-
-<p>finally, start npcd and restart icinga by executing</p>
-
-<pre><code># service apache2 restart
-# service npcd start
-# service icinga restart
-</code></pre>
-
-<p>login to http://hostname/icinga with user icingaadmin and the password you specified. enjoy icinga with pnp4nagios!</p>
-
-<p>One last hint: If you&#8217;re still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
+<p>Possible pitfall: make sure, the hostname (don't use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently.</p>
 ]]></content>
   </entry>
   

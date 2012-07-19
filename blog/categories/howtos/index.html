@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin) - David Heidt's Blog</title>
+  <title>Category: howtos - David Heidt's Blog</title>
   <meta name="author" content="David Heidt">
 
   
-  <meta name="description" content="This is actually so easy and painless, I had to write this down: I presume installing apache2 is no problem for you. This short tutorial covers a &hellip;">
+  <meta name="description" content="Category: howtos">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/">
+  <link rel="canonical" href="http://witscher.github.comblog/categories/howtos/">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -76,148 +76,36 @@
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
+<article role="article">
   
   <header>
-    
-      <h1 class="entry-title">Installing Icinga and Pnp4nagios on Ubuntu 12.04 (Precise Pangolin)</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-06-19T11:30:00+02:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
-        
-         | <a href="#disqus_thread">Comments</a>
-        
-      </p>
+    <h1 class="entry-title">Category: Howtos</h1>
     
   </header>
-
-
-<div class="entry-content"><p>This is actually so easy and painless, I had to write this down:</p>
-
-<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let&#8217;s do it:</p>
-
-<pre><code>aptitude install icinga pnp4nagios
-</code></pre>
-
-<p>and follow debconf&#8217;s instructions</p>
-
-<p>In /etc/icinga/icinga.cfg change the following variable</p>
-
-<pre><code>process_performance_data=1
-</code></pre>
-
-<p>and set this one:</p>
-
-<pre><code>broker_module=/usr/lib/pnp4nagios/npcdmod.o config_file=/etc/pnp4nagios/npcd.cfg
-</code></pre>
-
-<p>Now, edit /etc/default/npcd and set</p>
-
-<pre><code>RUN="yes"
-</code></pre>
-
-<p>finally, enable the views in icingas standard templates:
-for hosts, edit /etc/icinga/objects/generic-host_icinga.cfg
-and add</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$
-</code></pre>
-
-<p>for services, edit /etc/icinga/objects/generic-service_icinga.cfg
-and add:</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$&amp;srv=$SERVICEDESC$
-</code></pre>
-
-<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the &#8220;nagios3&#8221; directory to &#8220;icinga&#8221;:</p>
-
-<pre><code>AuthUserFile /etc/icinga/htpasswd.users
-</code></pre>
-
-<p>finally, start npcd and restart icinga by executing</p>
-
-<pre><code># service apache2 restart
-# service npcd start
-# service icinga restart
-</code></pre>
-
-<p>login to http://hostname/icinga with user icingaadmin and the password you specified. enjoy icinga with pnp4nagios!</p>
-
-<p>One last hint: If you&#8217;re still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
-      
   
-
-<span class="byline author vcard">Posted by <span class="fn">David Heidt</span></span>
-
-      
-
-
-
-
-
+  <div id="blog-archives" class="category">
 
 
 
   
+  <h2>2012</h2>
+
+<article>
+  
+<h1><a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/">ssl websocket proxy with stunnel howto</a></h1>
+<time datetime="2012-07-19T14:01:00+02:00" pubdate><span class='month'>Jul</span> <span class='day'>19</span> <span class='year'>2012</span></time>
+
+<footer>
+  <span class="categories">posted in <a class='category' href='/blog/categories/ubuntu/'>Ubuntu</a>, <a class='category' href='/blog/categories/howtos/'>howtos</a>, <a class='category' href='/blog/categories/slanger/'>slanger</a>, <a class='category' href='/blog/categories/stunnel/'>stunnel</a></span>
+</footer>
 
 
-<time datetime="2012-06-19T11:30:00+02:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
-      
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/apache/'>apache</a>, <a class='category' href='/blog/categories/icinga/'>icinga</a>, <a class='category' href='/blog/categories/monitoring/'>monitoring</a>, <a class='category' href='/blog/categories/pnp4nagios/'>pnp4nagios</a>
-  
-</span>
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/" data-via="witsches" data-counturl="http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/" >Tweet</a>
-  
-  
-  <div class="g-plusone" data-size="medium"></div>
-  
-  
-    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
-  
-</div>
-
-    
-    <p class="meta">
-      
-      
-        <a class="basic-alignment right" href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/" title="Next Post: ssl websocket proxy with stunnel howto">ssl websocket proxy with stunnel howto &raquo;</a>
-      
-    </p>
-  </footer>
 </article>
 
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
-  </section>
+
+  
+</article>
 
 </div>
 
@@ -315,10 +203,7 @@ and add:</p>
       var disqus_shortname = 'davidheidtsblog';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/';
-        var disqus_url = 'http://witscher.github.com/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

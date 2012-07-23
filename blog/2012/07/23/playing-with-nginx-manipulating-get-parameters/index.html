@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin) - David Heidt's Blog</title>
+  <title>playing with nginx - manipulating GET parameters - David Heidt's Blog</title>
   <meta name="author" content="David Heidt">
 
   
-  <meta name="description" content="This is actually so easy and painless, I had to write this down: I presume installing apache2 is no problem for you. This short tutorial covers a &hellip;">
+  <meta name="description" content="forced GET Parameters If you want a virtual host or a location to be jailed to certain GET parameters, use the rewrite module: force one GET &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/">
+  <link rel="canonical" href="http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -80,7 +80,7 @@
   
   <header>
     
-      <h1 class="entry-title">Installing Icinga and Pnp4nagios on Ubuntu 12.04 (Precise Pangolin)</h1>
+      <h1 class="entry-title">Playing With Nginx - Manipulating GET Parameters</h1>
     
     
       <p class="meta">
@@ -96,7 +96,7 @@
   
 
 
-<time datetime="2012-06-19T11:30:00+02:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
+<time datetime="2012-07-23T13:07:00+02:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2012</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -105,58 +105,87 @@
   </header>
 
 
-<div class="entry-content"><p>This is actually so easy and painless, I had to write this down:</p>
+<div class="entry-content"><h2>forced GET Parameters</h2>
 
-<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let&#8217;s do it:</p>
+<p>If you want a virtual host or a location to be jailed to certain GET parameters, use the rewrite module:</p>
 
-<pre><code>aptitude install icinga pnp4nagios
+<figure class='code'><figcaption><span>force one GET parameter  </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location /list {
+</span><span class='line'>  rewrite ^(.*)$ $1?list=true
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>an even smarter solution is to transport existing GET parameters, too:</p>
+
+<figure class='code'><figcaption><span>force one and preserve existing GET parameters </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location /list {
+</span><span class='line'>
+</span><span class='line'>    rewrite ^(.*)$ $1?list=true&$args break;
+</span><span class='line'>
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>this way, nginx forwards all other GET parameters. The jailed <em>&#8220;list=true&#8221;</em> should be safe, too. In my tests, the app behind used the <em>&#8220;first come first serve&#8221;</em> method:</p>
+
+<pre><code>http://example.com/list/?list=false
 </code></pre>
 
-<p>and follow debconf&#8217;s instructions</p>
+<p>rewrites to:</p>
 
-<p>In /etc/icinga/icinga.cfg change the following variable</p>
-
-<pre><code>process_performance_data=1
+<pre><code>/list/?list=true&amp;list=false
 </code></pre>
 
-<p>and set this one:</p>
+<p>evaluates to:</p>
 
-<pre><code>broker_module=/usr/lib/pnp4nagios/npcdmod.o config_file=/etc/pnp4nagios/npcd.cfg
+<pre><code>list = true
 </code></pre>
 
-<p>Now, edit /etc/default/npcd and set</p>
+<h2>use the reverse proxy module for API calls</h2>
 
-<pre><code>RUN="yes"
-</code></pre>
+<p>With the above, accessing external APIs gives you more possibilities:
+To hide details of the api calls (credentials, keys, service name, etc.) just add parameters at proxy level, keeping it away from your app and your visitors:</p>
 
-<p>finally, enable the views in icingas standard templates:
-for hosts, edit /etc/icinga/objects/generic-host_icinga.cfg
-and add</p>
+<figure class='code'><figcaption><span>hidden API call </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location /example-api {
+</span><span class='line'>
+</span><span class='line'>  rewrite ^(.*)$ $1?apikey=secretKey&userid=exampleuser&$args break;
+</span><span class='line'>  proxy_pass http://api.example.com;
+</span><span class='line'>
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$
-</code></pre>
 
-<p>for services, edit /etc/icinga/objects/generic-service_icinga.cfg
-and add:</p>
+<p>http basic auth should work, too (I didn&#8217;t test this, Feedback appreciated!):</p>
 
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$&amp;srv=$SERVICEDESC$
-</code></pre>
+<figure class='code'><figcaption><span>hidden API call with http basic auth </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>location /example-api {
+</span><span class='line'>
+</span><span class='line'>  rewrite ^(.*)$ $1?apikey=secretKey&$args break;
+</span><span class='line'>  proxy_pass http://user:password@api.example.com;
+</span><span class='line'>
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
 
-<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the &#8220;nagios3&#8221; directory to &#8220;icinga&#8221;:</p>
 
-<pre><code>AuthUserFile /etc/icinga/htpasswd.users
-</code></pre>
 
-<p>finally, start npcd and restart icinga by executing</p>
-
-<pre><code># service apache2 restart
-# service npcd start
-# service icinga restart
-</code></pre>
-
-<p>login to http://hostname/icinga with user icingaadmin and the password you specified. enjoy icinga with pnp4nagios!</p>
-
-<p>One last hint: If you&#8217;re still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
 </div>
 
 
@@ -179,12 +208,12 @@ and add:</p>
   
 
 
-<time datetime="2012-06-19T11:30:00+02:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
+<time datetime="2012-07-23T13:07:00+02:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2012</time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/apache/'>apache</a>, <a class='category' href='/blog/categories/icinga/'>icinga</a>, <a class='category' href='/blog/categories/monitoring/'>monitoring</a>, <a class='category' href='/blog/categories/pnp4nagios/'>pnp4nagios</a>
+    <a class='category' href='/blog/categories/howtos/'>howtos</a>, <a class='category' href='/blog/categories/nginx/'>nginx</a>
   
 </span>
 
@@ -193,7 +222,7 @@ and add:</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/" data-via="witsches" data-counturl="http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/" data-via="witsches" data-counturl="http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -206,8 +235,8 @@ and add:</p>
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/" title="Previous Post: ssl websocket proxy with stunnel howto">&laquo; ssl websocket proxy with stunnel howto</a>
       
-        <a class="basic-alignment right" href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/" title="Next Post: ssl websocket proxy with stunnel howto">ssl websocket proxy with stunnel howto &raquo;</a>
       
     </p>
   </footer>
@@ -320,8 +349,8 @@ and add:</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/';
-        var disqus_url = 'http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/';
+        var disqus_identifier = 'http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/';
+        var disqus_url = 'http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/';
         var disqus_script = 'embed.js';
       
     (function () {

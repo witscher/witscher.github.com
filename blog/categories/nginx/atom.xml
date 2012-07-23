@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: nginx | David Heidt's Blog]]></title>
+  <link href="http://blog.heidt.biz/blog/categories/nginx/atom.xml" rel="self"/>
+  <link href="http://blog.heidt.biz/"/>
+  <updated>2012-07-23T13:21:32+02:00</updated>
+  <id>http://blog.heidt.biz/</id>
+  <author>
+    <name><![CDATA[David Heidt]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[playing with nginx - manipulating GET parameters]]></title>
+    <link href="http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/"/>
+    <updated>2012-07-23T13:07:00+02:00</updated>
+    <id>http://blog.heidt.biz/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters</id>
+    <content type="html"><![CDATA[<h2>forced GET Parameters</h2>
+
+<p>If you want a virtual host or a location to be jailed to certain GET parameters, use the rewrite module:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>force one GET parameter  </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
+</span><span class='line'>location /list {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>rewrite ^(.*)$ $1?list=true
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>an even smarter solution is to transport existing GET parameters, too:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>force one and preserve existing GET parameters </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;p>location /list {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>rewrite ^(.*)$ $1?list=true&amp;$args break;
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>this way, nginx forwards all other GET parameters. The jailed <em>"list=true"</em> should be safe, too. In my tests, the app behind used the <em>"first come first serve"</em> method:</p>
+
+<pre><code>http://example.com/list/?list=false
+</code></pre>
+
+<p>rewrites to:</p>
+
+<pre><code>/list/?list=true&amp;list=false
+</code></pre>
+
+<p>evaluates to:</p>
+
+<pre><code>list = true
+</code></pre>
+
+<h2>use the reverse proxy module for API calls</h2>
+
+<p>With the above, accessing external APIs gives you more possibilities:
+To hide details of the api calls (credentials, keys, service name, etc.) just add parameters at proxy level, keeping it away from your app and your visitors:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>hidden API call </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
+</span><span class='line'>location /example-api {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>rewrite ^(.*)$ $1?apikey=secretKey&amp;userid=exampleuser&amp;$args break;
+</span><span class='line'>proxy_pass http://api.example.com;
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>http basic auth should work, too (I didn't test this, Feedback appreciated!):</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>hidden API call with http basic auth </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
+</span><span class='line'>location /example-api {&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>rewrite ^(.*)$ $1?apikey=secretKey&amp;$args break;
+</span><span class='line'>proxy_pass http://user:password@api.example.com;
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>}</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+</feed>

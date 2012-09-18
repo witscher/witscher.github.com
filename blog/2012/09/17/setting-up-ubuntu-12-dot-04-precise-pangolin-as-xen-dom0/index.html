@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>David Heidt's Blog</title>
+  <title>Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0 - David Heidt's Blog</title>
   <meta name="author" content="David Heidt">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://blog.heidt.biz/">
+  <link rel="canonical" href="http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/">
   <link href="/favicon.ico" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -75,15 +75,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/">Setting Up Ubuntu 12.04 (Precise Pangolin) as XEN Dom0</a></h1>
+      <h1 class="entry-title">Setting Up Ubuntu 12.04 (Precise Pangolin) as XEN Dom0</h1>
     
     
       <p class="meta">
@@ -101,14 +98,14 @@
 
 <time datetime="2012-09-17T18:39:00+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2012</time>
         
-         | <a href="/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/#disqus_thread">Comments</a>
+         | <a href="#disqus_thread">Comments</a>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><h2>Setting up a XEN Dom0 with a LTS release of Ubuntu Linux is easy again. Hooray!</h2>
+<div class="entry-content"><h2>Setting up a XEN Dom0 with a LTS release of Ubuntu Linux is easy again. Hooray!</h2>
 
 <p>First, install a standard Ubuntu Server System. Select no extras but ssh server.</p>
 
@@ -263,140 +260,16 @@
 </ul>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/">Playing With Nginx - Manipulating GET Parameters</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">David Heidt</span></span>
 
-<time datetime="2012-07-23T13:07:00+02:00" pubdate data-updated="true">Jul 23<span>rd</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>forced GET Parameters</h2>
-
-<p>If you want a virtual host or a location to be jailed to certain GET parameters, use the rewrite module:</p>
-
-<figure class='code'><figcaption><span>force one GET parameter  </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location /list {
-</span><span class='line'>  rewrite ^(.*)$ $1?list=true
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>an even smarter solution is to transport existing GET parameters, too:</p>
-
-<figure class='code'><figcaption><span>force one and preserve existing GET parameters </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location /list {
-</span><span class='line'>
-</span><span class='line'>    rewrite ^(.*)$ $1?list=true&$args break;
-</span><span class='line'>
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>this way, nginx forwards all other GET parameters. The jailed <em>&#8220;list=true&#8221;</em> should be safe, too. In my tests, the app behind used the <em>&#8220;first come first serve&#8221;</em> method:</p>
-
-<pre><code>http://example.com/list/?list=false
-</code></pre>
-
-<p>rewrites to:</p>
-
-<pre><code>/list/?list=true&amp;list=false
-</code></pre>
-
-<p>evaluates to:</p>
-
-<pre><code>list = true
-</code></pre>
-
-<h2>use the reverse proxy module for API calls</h2>
-
-<p>With the above, accessing external APIs gives you more possibilities:
-To hide details of the api calls (credentials, keys, service name, etc.) just add parameters at proxy level, keeping it away from your app and your visitors:</p>
-
-<figure class='code'><figcaption><span>hidden API call </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location /example-api {
-</span><span class='line'>
-</span><span class='line'>  rewrite ^(.*)$ $1?apikey=secretKey&userid=exampleuser&$args break;
-</span><span class='line'>  proxy_pass http://api.example.com;
-</span><span class='line'>
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-<p>http basic auth should work, too (I didn&#8217;t test this, Feedback appreciated!):</p>
-
-<figure class='code'><figcaption><span>hidden API call with http basic auth </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location /example-api {
-</span><span class='line'>
-</span><span class='line'>  rewrite ^(.*)$ $1?apikey=secretKey&$args break;
-</span><span class='line'>  proxy_pass http://user:password@api.example.com;
-</span><span class='line'>
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/">Ssl Websocket Proxy With Stunnel Howto</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -408,196 +281,42 @@ To hide details of the api calls (credentials, keys, service name, etc.) just ad
   
 
 
-<time datetime="2012-07-19T14:01:00+02:00" pubdate data-updated="true">Jul 19<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently we made up a new rails webapp using the <a href="http://pusher.com/docs/pusher_protocol">pusher protocol</a> in combination with <a href="https://github.com/stevegraham/slanger">Slanger</a> as websocket server.</p>
-
-<p>The site needed to support both, plain http and encrypted https, so I decided to start slanger in standard mode (no ssl) and put a ssl-terminating proxy in front to handle the wss:// URIs</p>
-
-<p>There were rumors that <a href="http://www.apsis.ch/pound/">pound</a> was capable of proxying TCP requests. I work with pound for quite a long time and did not manage to get it working. However, <a href="http://www.stunnel.org/">stunnel</a> offered a fast and solid  solution:</p>
-
-<p>The code snippets apply to Ubuntu 10.04, but this should work on other environments, too.
-I installed stunnel with</p>
-
-<pre><code># aptitude install stunnel4
-</code></pre>
-
-<p>and ended up with this configuration:</p>
-
-<figure class='code'><figcaption><span>/etc/stunnel/stunnel.conf  </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>; Certificate/key is needed in server mode and optional in client mode
-</span><span class='line'><span class="nv">cert</span> <span class="o">=</span> /path/to/cert-or-cert-chain.pem
-</span><span class='line'><span class="nv">key</span> <span class="o">=</span> /path/to/private.key
-</span><span class='line'>
-</span><span class='line'>; Protocol version <span class="o">(</span>all, SSLv2, SSLv3, TLSv1<span class="o">)</span>
-</span><span class='line'><span class="nv">sslVersion</span> <span class="o">=</span> all
-</span><span class='line'>; no, we don<span class="err">&#39;</span>t want SSLv2
-</span><span class='line'><span class="nv">options</span> <span class="o">=</span> NO_SSLv2
-</span><span class='line'>; Some extra strong ciphers
-</span><span class='line'><span class="nv">ciphers</span> <span class="o">=</span> ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM
-</span><span class='line'>
-</span><span class='line'>; Some security enhancements <span class="k">for </span>UNIX systems - comment them out on Win32
-</span><span class='line'><span class="nv">chroot</span> <span class="o">=</span> /var/lib/stunnel4/
-</span><span class='line'><span class="nv">setuid</span> <span class="o">=</span> stunnel4
-</span><span class='line'><span class="nv">setgid</span> <span class="o">=</span> stunnel4
-</span><span class='line'>; PID is created inside the chroot jail
-</span><span class='line'><span class="nv">pid</span> <span class="o">=</span> /stunnel4.pid
-</span><span class='line'>
-</span><span class='line'>; Some performance tunings
-</span><span class='line'><span class="nv">socket</span> <span class="o">=</span> l:TCP_NODELAY<span class="o">=</span>1
-</span><span class='line'><span class="nv">socket</span> <span class="o">=</span> r:TCP_NODELAY<span class="o">=</span>1
-</span><span class='line'>;<span class="nv">compression</span> <span class="o">=</span> zlib
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'><span class="o">[</span>https<span class="o">]</span>
-</span><span class='line'><span class="nv">accept</span>  <span class="o">=</span> &lt;your public IP&gt;:8443
-</span><span class='line'>
-</span><span class='line'>; slanger server listens on port 8080
-</span><span class='line'><span class="nv">connect</span> <span class="o">=</span> &lt;public or <span class="nb">local </span>IP&gt;:8080
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If you can spare an extra server or an additional IP Address for your websocket server, it may be better to use the standard ports 80 and 443.</p>
-
-<p>Possible pitfall: make sure, the hostname (don&#8217;t use an IP Address!) of yor pusher clients matches the common name of the certificate provided to stunnel. Otherwise some browsers (chrome at least) will fail silently when connecting to secure websocket URIs (wss://example.com/).</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2012-09-17T18:39:00+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2012</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/">Installing Icinga and Pnp4nagios on Ubuntu 12.04 (Precise Pangolin)</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2012-06-19T11:30:00+02:00" pubdate data-updated="true">Jun 19<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is actually so easy and painless, I had to write this down:</p>
-
-<p>I presume installing apache2 is no problem for you. This short tutorial covers a very minimalistic icinga installation, no idoutils, no distribution, no check_mk. So, let&#8217;s do it:</p>
-
-<pre><code>aptitude install icinga pnp4nagios
-</code></pre>
-
-<p>and follow debconf&#8217;s instructions</p>
-
-<p>In /etc/icinga/icinga.cfg change the following variable</p>
-
-<pre><code>process_performance_data=1
-</code></pre>
-
-<p>and set this one:</p>
-
-<pre><code>broker_module=/usr/lib/pnp4nagios/npcdmod.o config_file=/etc/pnp4nagios/npcd.cfg
-</code></pre>
-
-<p>Now, edit /etc/default/npcd and set</p>
-
-<pre><code>RUN="yes"
-</code></pre>
-
-<p>finally, enable the views in icingas standard templates:
-for hosts, edit /etc/icinga/objects/generic-host_icinga.cfg
-and add</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$
-</code></pre>
-
-<p>for services, edit /etc/icinga/objects/generic-service_icinga.cfg
-and add:</p>
-
-<pre><code>action_url  /pnp4nagios/graph?host=$HOSTNAME$&amp;srv=$SERVICEDESC$
-</code></pre>
-
-<p>One last thing: change this line in  /etc/apache2/conf.d/pnp4nagios.conf from the &#8220;nagios3&#8221; directory to &#8220;icinga&#8221;:</p>
-
-<pre><code>AuthUserFile /etc/icinga/htpasswd.users
-</code></pre>
-
-<p>finally, start npcd and restart icinga by executing</p>
-
-<pre><code># service apache2 restart
-# service npcd start
-# service icinga restart
-</code></pre>
-
-<p>login to http://hostname/icinga with user icingaadmin and the password you specified. enjoy icinga with pnp4nagios!</p>
-
-<p>One last hint: If you&#8217;re still using nagios and thinking about using icinga: Just copy your nagios config files to icinga and be much happier. In most cases this awesome fork works out of the box!</p>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/" data-via="witsches" data-counturl="http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/" title="Previous Post: playing with nginx - manipulating GET parameters">&laquo; playing with nginx - manipulating GET parameters</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -626,7 +345,7 @@ and add:</p>
 <section>
   <h1>GitHub Repos</h1>
   <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   
   <a href="https://github.com/witscher">@witscher</a> on GitHub
@@ -656,7 +375,7 @@ and add:</p>
 <section>
   <h1>Latest Tweets</h1>
   <ul id="tweets">
-    <li class="loading">Status updating&#8230;</li>
+    <li class="loading">Status updating...</li>
   </ul>
   <script type="text/javascript">
     $.domReady(function(){
@@ -685,6 +404,7 @@ and add:</p>
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -699,7 +419,10 @@ and add:</p>
       var disqus_shortname = 'davidheidtsblog';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/';
+        var disqus_url = 'http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

@@ -4,7 +4,7 @@
   <title><![CDATA[David Heidt's Blog]]></title>
   <link href="http://blog.heidt.biz/atom.xml" rel="self"/>
   <link href="http://blog.heidt.biz/"/>
-  <updated>2012-07-23T13:21:32+02:00</updated>
+  <updated>2012-09-18T12:37:31+02:00</updated>
   <id>http://blog.heidt.biz/</id>
   <author>
     <name><![CDATA[David Heidt]]></name>
@@ -12,6 +12,168 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0]]></title>
+    <link href="http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/"/>
+    <updated>2012-09-17T18:39:00+02:00</updated>
+    <id>http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0</id>
+    <content type="html"><![CDATA[<h2>Setting up a XEN Dom0 with a LTS release of Ubuntu Linux is easy again. Hooray!</h2>
+
+<p>First, install a standard Ubuntu Server System. Select no extras but ssh server.</p>
+
+<h3>Install the XEN packages</h3>
+
+<pre><code># sudo aptitude install xen-hypervisor-amd64
+</code></pre>
+
+<h3>modify grub configuration in /etc/default/grub</h3>
+
+<figure class='code'><figcaption><span>/etc/default/grub  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># If you change this file, run &#39;update-grub&#39; afterwards to update</span>
+</span><span class='line'><span class="c"># /boot/grub/grub.cfg.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">GRUB_DEFAULT</span><span class="o">=</span><span class="s2">&quot;Xen 4.1-amd64&quot;</span>
+</span><span class='line'><span class="c">#GRUB_HIDDEN_TIMEOUT=0</span>
+</span><span class='line'><span class="nv">GRUB_HIDDEN_TIMEOUT_QUIET</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'><span class="nv">GRUB_TIMEOUT</span><span class="o">=</span>3
+</span><span class='line'><span class="nv">GRUB_DISTRIBUTOR</span><span class="o">=</span><span class="sb">`</span>lsb_release -i -s 2&gt; /dev/null <span class="o">||</span> <span class="nb">echo </span>Debian<span class="sb">`</span>
+</span><span class='line'><span class="nv">GRUB_CMDLINE_LINUX_DEFAULT</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</span><span class='line'><span class="nv">GRUB_CMDLINE_LINUX</span><span class="o">=</span><span class="s2">&quot;rootdelay=180&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment to disable graphical terminal (grub-pc only)</span>
+</span><span class='line'><span class="c">#GRUB_TERMINAL=console</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># The resolution used on graphical terminal</span>
+</span><span class='line'><span class="c"># note that you can use only modes which your graphic card supports via VBE</span>
+</span><span class='line'><span class="c"># you can see them in real GRUB with the command `vbeinfo&#39;</span>
+</span><span class='line'><span class="c">#GRUB_GFXMODE=640x480</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment if you don&#39;t want GRUB to pass &quot;root=UUID=xxx&quot; parameter to Linux</span>
+</span><span class='line'><span class="c">#GRUB_DISABLE_LINUX_UUID=true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment to disable generation of recovery mode menu entries</span>
+</span><span class='line'><span class="c">#GRUB_DISABLE_LINUX_RECOVERY=&quot;true&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Uncomment to get a beep at grub start</span>
+</span><span class='line'><span class="c">#GRUB_INIT_TUNE=&quot;480 440 1&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Disable OS prober to prevent virtual machines on logical volumes from appearing in the boot menu.</span>
+</span><span class='line'><span class="nv">GRUB_DISABLE_OS_PROBER</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Xen boot parameters for all Xen boots</span>
+</span><span class='line'><span class="c">#GRUB_CMDLINE_XEN=&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Xen boot parameters for non-recovery Xen boots (in addition to GRUB_CMDLINE_XEN)</span>
+</span><span class='line'><span class="nv">GRUB_CMDLINE_XEN_DEFAULT</span><span class="o">=</span><span class="s2">&quot;dom0_mem=512M&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I set the memory to 512MB for the Dom0. If you don&#8217;t plan additional services and use this host as Dom0 only, this is largely enough.</p>
+
+<h2>update the bootloader:</h2>
+
+<pre><code># sudo update-grub
+</code></pre>
+
+<h2>select default toolstack</h2>
+
+<figure class='code'><figcaption><span>/etc/default/xen  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Configuration for Xen system</span>
+</span><span class='line'><span class="c"># ----------------------------</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># There exists several tool stacks to configure a Xen system.</span>
+</span><span class='line'><span class="c"># ?~@?</span>
+</span><span class='line'><span class="c"># Attention: You need to reboot after changing this!</span>
+</span><span class='line'><span class="nv">TOOLSTACK</span><span class="o">=</span><span class="s2">&quot;xl&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I prefer <em>xl</em>, but you can also use the old <em>xm</em> toolstack</p>
+
+<h2>reboot and run</h2>
+
+<pre><code># xl list 
+</code></pre>
+
+<p>this should give you an output like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Name                                        ID   Mem VCPUs   State   Time(s)
+</span><span class='line'>Domain-0                                     0   511     8     r-----       9.9</span></code></pre></td></tr></table></div></figure>
+
+
+<p>also, the <em>xl info</em> command gives you the right amount of memory you have on your system:</p>
+
+<figure class='code'><figcaption><span>output on a 64G machine </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># xl info | grep memory
+</span><span class='line'>total_memory           : 65523
+</span><span class='line'>free_memory            : 64169</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and that&#8217;s it.</p>
+
+<h4>coming up next:</h4>
+
+<p>DomU setup (paravirtualized Linux Guests, HVM Windows Guests)</p>
+
+<h4>recipe based on:</h4>
+
+<ul>
+<li><a href="https://help.ubuntu.com/community/XenProposed">https://help.ubuntu.com/community/XenProposed</a></li>
+<li><a href="http://wiki.debian.org/Xen">http://wiki.debian.org/Xen</a></li>
+<li>and several years playing around with XEN :)</li>
+</ul>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[playing with nginx - manipulating GET parameters]]></title>

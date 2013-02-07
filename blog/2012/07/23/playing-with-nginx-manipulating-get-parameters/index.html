@@ -161,8 +161,8 @@ To hide details of the api calls (credentials, keys, service name, etc.) just ad
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>location /example-api {
-</span><span class='line'>
-</span><span class='line'>  rewrite ^(.*)$ $1?apikey=secretKey&userid=exampleuser&$args break;
+</span><span class='line'>  # updated on Feb. 8th 2013
+</span><span class='line'>  rewrite ^/example-api/(.*)$ /$1?apikey=secretKey&userid=exampleuser&$args break;
 </span><span class='line'>  proxy_pass http://api.example.com;
 </span><span class='line'>
 </span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
@@ -343,7 +343,7 @@ To hide details of the api calls (credentials, keys, service name, etc.) just ad
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2012 - David Heidt -
+  Copyright &copy; 2013 - David Heidt -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

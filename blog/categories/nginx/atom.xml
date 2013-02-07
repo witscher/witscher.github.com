@@ -4,7 +4,7 @@
   <title><![CDATA[Category: nginx | David Heidt's Blog]]></title>
   <link href="http://blog.heidt.biz/blog/categories/nginx/atom.xml" rel="self"/>
   <link href="http://blog.heidt.biz/"/>
-  <updated>2012-09-18T12:37:31+02:00</updated>
+  <updated>2013-02-07T13:21:52+01:00</updated>
   <id>http://blog.heidt.biz/</id>
   <author>
     <name><![CDATA[David Heidt]]></name>
@@ -87,10 +87,12 @@ To hide details of the api calls (credentials, keys, service name, etc.) just ad
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>&lt;br/>
 </span><span class='line'>location /example-api {&lt;/p>
 </span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>rewrite ^(.*)$ $1?apikey=secretKey&amp;userid=exampleuser&amp;$args break;
+</span><span class='line'>&lt;pre>&lt;code># updated on Feb. 8th 2013
+</span><span class='line'>rewrite ^/example-api/(.*)$ /$1?apikey=secretKey&amp;userid=exampleuser&amp;$args break;
 </span><span class='line'>proxy_pass http://api.example.com;
 </span><span class='line'>&lt;/code>&lt;/pre>
 </span><span class='line'>

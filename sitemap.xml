@@ -4,7 +4,7 @@
         <loc>
             http://blog.heidt.biz/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/
         </loc>
-        <lastmod>2012-07-18T11:36:31+02:00</lastmod>
+        <lastmod>2013-02-15T11:12:48+01:00</lastmod>
     </url>
     <url>
         <loc>http://blog.heidt.biz/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/</loc>
@@ -20,14 +20,20 @@
         <loc>
             http://blog.heidt.biz/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/
         </loc>
-        <lastmod>2012-09-18T12:37:31+02:00</lastmod>
+        <lastmod>2013-04-09T10:10:20+02:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/
+        </loc>
+        <lastmod>2013-04-09T11:52:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://blog.heidt.biz/blog/archives/</loc>
-        <lastmod>2013-02-07T13:18:13+01:00</lastmod>
+        <lastmod>2013-04-09T11:52:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://blog.heidt.biz/</loc>
-        <lastmod>2013-02-07T13:18:13+01:00</lastmod>
+        <lastmod>2013-04-09T11:52:56+02:00</lastmod>
     </url>
 </urlset>

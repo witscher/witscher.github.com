@@ -109,6 +109,8 @@
 
 <p>First, install a standard Ubuntu Server System. Select no extras but ssh server.</p>
 
+<p><strong>If you&#8217;re going to setup your DomUs as decribed in <a href="/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/">my best-practice DomU setup on Ubuntu 12.04 (precise pangolin)</a>, please install with LVM and use 15G as root partition and about 5G as swap Space. The rest of the volume group is reserved for DomUs. Remember to mount /boot outside of the LVM, usually a 512M ext4 partition on the very beginning of the disk.</strong></p>
+
 <h3>Install the XEN packages</h3>
 
 <pre><code># sudo aptitude install xen-hypervisor-amd64
@@ -215,15 +217,33 @@
 </span><span class='line'><span class="c"># There exists several tool stacks to configure a Xen system.</span>
 </span><span class='line'><span class="c"># ?~@?</span>
 </span><span class='line'><span class="c"># Attention: You need to reboot after changing this!</span>
-</span><span class='line'><span class="nv">TOOLSTACK</span><span class="o">=</span><span class="s2">&quot;xl&quot;</span>
+</span><span class='line'><span class="nv">TOOLSTACK</span><span class="o">=</span><span class="s2">&quot;xm&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I prefer <em>xl</em>, but you can also use the old <em>xm</em> toolstack</p>
+<p>You could also use &#8216;xl&#8217;, I will use xm in this case.</p>
+
+<h2>change default behaviour of XEN DomU management:</h2>
+
+<p>By default, the system will save the memory of running domUs when shutting dowm or restarting the Dom0. This usually takes a very long time and also this can cause the system to hang. So we deactivate this in /etc/default/xendomains</p>
+
+<figure class='code'><figcaption><span>/etc/default/xendomains  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>...<span class="o">]</span>
+</span><span class='line'><span class="nv">XENDOMAINS_SAVE</span><span class="o">=</span><span class="s2">&quot;&quot;</span>
+</span><span class='line'><span class="o">[</span>...<span class="o">]</span>
+</span><span class='line'><span class="nv">XENDOMAINS_RESTORE</span><span class="o">=</span><span class="nb">false</span>
+</span><span class='line'><span class="o">[</span>...<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <h2>reboot and run</h2>
 
-<pre><code># xl list 
+<pre><code># xm list 
 </code></pre>
 
 <p>this should give you an output like this:</p>
@@ -259,6 +279,14 @@
 <li>and several years playing around with XEN :)</li>
 </ul>
 
+
+<h4>Edited on 2012-04-09:</h4>
+
+<ul>
+<li>changed xl to xm</li>
+<li>added config chapter for /etc/default/xendomains</li>
+</ul>
+
 </div>
 
 
@@ -284,6 +312,12 @@
 <time datetime="2012-09-17T18:39:00+02:00" pubdate data-updated="true">Sep 17<span>th</span>, 2012</time>
       
 
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/howtos/'>howtos</a>, <a class='category' href='/blog/categories/xen/'>xen</a>
+  
+</span>
+
 
     </p>
     
@@ -305,6 +339,8 @@
         <a class="basic-alignment left" href="/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/" title="Previous Post: playing with nginx - manipulating GET parameters">&laquo; playing with nginx - manipulating GET parameters</a>
       
       
+        <a class="basic-alignment right" href="/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/" title="Next Post: My best-practice DomU setup on Ubuntu 12.04 (precise pangolin)">My best-practice DomU setup on Ubuntu 12.04 (precise pangolin) &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -322,6 +358,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/">My best-practice DomU setup on Ubuntu 12.04 (precise pangolin)</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/">Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0</a>

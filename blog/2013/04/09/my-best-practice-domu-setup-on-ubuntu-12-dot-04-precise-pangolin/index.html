@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>My best-practice DomU setup on Ubuntu 12.04 (precise pangolin) - David Heidt's Blog</title>
+  <meta name="author" content="David Heidt">
+
+  
+  <meta name="description" content="In this post I will demonstrate how I am setting up rather big infrastructures (> 10 DomUs, >2 Dom0s) Networking First, I create a bridged network &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/">
+  <link href="/favicon.ico" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="David Heidt's Blog" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-29670692-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">David Heidt's Blog</a></h1>
+  
+    <h2>linux and webserver stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:blog.heidt.biz" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+	<li><a href="/">Blog</a></li>
+	<li><a href="/blog/archives">Archives</a></li>
+	<li><a href="http://www.heidt.biz">Website</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">My Best-practice DomU Setup on Ubuntu 12.04 (Precise Pangolin)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-09T11:01:00+02:00" pubdate data-updated="true">Apr 9<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this post I will demonstrate how I am setting up rather big infrastructures (> 10 DomUs, >2 Dom0s)</p>
+
+<h2>Networking</h2>
+
+<p>First, I create a bridged network interface for my DomUs. In this case, it is a Dom0 in a private LAN.</p>
+
+<p>If this is not yet installed, install the bridging utilities:</p>
+
+<pre><code># sudo aptitude install bridge-utils
+</code></pre>
+
+<figure class='code'><figcaption><span>/etc/network/interfaces  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Local</span>
+</span><span class='line'>auto lo
+</span><span class='line'>iface lo inet loopback
+</span><span class='line'>
+</span><span class='line'><span class="c"># LAN interface</span>
+</span><span class='line'>auto eth0
+</span><span class='line'>iface eth0 inet manual
+</span><span class='line'>        post-up ifconfig eth0 0.0.0.0 up
+</span><span class='line'>        pre-down ifconfig eth0 0.0.0.0 down
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Bridge to LAN </span>
+</span><span class='line'>auto xenbr0
+</span><span class='line'>iface xenbr0 inet static
+</span><span class='line'>  address 10.0.0.1
+</span><span class='line'>  netmask 255.255.255.0
+</span><span class='line'>  gateway 10.0.0.254
+</span><span class='line'>  dns-nameservers 10.0.0.254
+</span><span class='line'>
+</span><span class='line'>  <span class="c"># configure the bridge</span>
+</span><span class='line'>    bridge_ports eth0
+</span><span class='line'>    bridge_stp no
+</span><span class='line'>    bridge_fd 2
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>restart your server or stop and start networking, if you&#8217;re on a local console</p>
+
+<p>If you use bridging this way, nothing needs to be changed in xend config</p>
+
+<h3>non-local networking</h3>
+
+<p>I cannot help you out here - this usually goes too deep. However, I can give you some hints:</p>
+
+<p>Networking can be really frustrating, especially if you have multiple bridges or public ip Addresses. Hosters often have special networking setups that require special actions, like setting up routes on the Dom0 or asking the hosters support to allow multiple mac addresses on a switchport.</p>
+
+<p>The most important thing here is:
+<strong>Check if your hoster supports XEN before ordering!</strong></p>
+
+<p>Ideally there is a faq/bulletin that describes Virtual Machine Networking setup.</p>
+
+<p>If you still have heavy problems with networking, <a href="http://heidt.biz">I&#8217;am available for rent</a> ;)</p>
+
+<h2>Paravirtualized DomUs</h2>
+
+<p>Usually I am not setting up just one DomU, but a lot. As every sysadmin is a lazy bastard (at least I am), I try to keep my systems as homogeneous as possible: same distribution, same standard packages, same configuration, etc.
+For example: You have a Mail gateway in your LAN. Why not pass this as relayserver to every DomU&#8217;s mailserver in the moment of creation? Or what about granting remote access by auto-providing your ssh public key?</p>
+
+<h3>Preparing for many DomUs</h3>
+
+<p><em>Note: this is a rather old fashioned way of auto-provisioning virtual servers and services. But it works pretty good. If you prefer the hot stuff, have a look at <a href="http://wiki.opscode.com/">Chef</a>!</em></p>
+
+<p>I prefer installation with <em>xen-tools</em>, a toolset for semi-automatic DomU creation:</p>
+
+<pre><code># sudo aptitude install xen-tools
+</code></pre>
+
+<p>In order to install an ubuntu release as domU, the corresponding folder must be existent in /usr/lib/xen-tools.
+Precise is not there, so we just copy the karmic folder:</p>
+
+<pre><code># cp -a /usr/lib/xen-tools/karmic.d /usr/lib/xen-tools/precise.d
+</code></pre>
+
+<p>Why not symlink? Because you could add release-specific changes to the installation recipe like changing the default postfix configuration as described above, or installing toolsets and monitoring stuff like nagios-nrpe or munin-node.</p>
+
+<p>You may also create a tar package and preinstall everything you need. Xen tools can handle tar-templates as well.</p>
+
+<p>Now it&#8217;s time to create the DomU.</p>
+
+<h3>Create a DomU</h3>
+
+<pre><code># xen-create-image --bridge=xenbr0 --lvm=vg0 --dist=precise --fs=xfs --netmask=255.255.255.0 --gateway=10.0.0.254 --size=10Gb --swap=2Gb --memory=512Mb --ip=10.0.0.2 --hostname=myfirstdomU
+</code></pre>
+
+<p><em>If you always use the same parameters for your machines, I recommend to put them as default in /etc/xen-tools/xen-tools.conf</em></p>
+
+<p>Now, rename the config file:</p>
+
+<pre><code># mv /etc/xen/myfirstdomU.cfg /etc/xen/myfirstdomU
+</code></pre>
+
+<p>Reason: the config file name is now the same as the DomU name, so you can start/restart/stop with the same command.</p>
+
+<p>Start it with</p>
+
+<pre><code># xm create myfirstdomU
+</code></pre>
+
+<h3>DomU control commands</h3>
+
+<p>start a domU:</p>
+
+<pre><code># xm create &lt;name&gt; 
+</code></pre>
+
+<p>send a shutdown signal to the DomU:</p>
+
+<pre><code># xm shut &lt;name&gt; 
+</code></pre>
+
+<p>Sudden death to the DomU. Same as taking away power - no proper shutdown. Use this only when DomU is not responding on the console:</p>
+
+<pre><code># xm destroy &lt;name&gt; 
+</code></pre>
+
+<h2>Fully virtualized DomUs (HVM) (tested with Windows7, and Windows Server 2008 R2)</h2>
+
+<p>If you need HVM DomUs (For Linux Systems, please use paravirtualized DomUs!), You can do the setup manually:</p>
+
+<h3>Prerequisites</h3>
+
+<p>Create the volumes you want to use, i.E. a 60Gb Disk:</p>
+
+<pre><code># lvcreate -L 60G -n hvmdomu-disk /dev/vg0
+</code></pre>
+
+<p>and provision the installation iso image on the DomU, in my case this is /tmp/InstallImage.iso</p>
+
+<p>Now, use the Ubuntu provided hvm configuration:</p>
+
+<pre><code># zcat /usr/share/doc/xen-utils-common/examples/xmexample.hvm.gz &gt; /etc/xen/hvmdomu
+</code></pre>
+
+<p>Edit your new DomU config file and enter what you just created (only changes listed, leave the rest as provided):</p>
+
+<figure class='code'><figcaption><span>/etc/xen/hvmdomu  </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>...<span class="o">]</span>
+</span><span class='line'><span class="nv">vif</span> <span class="o">=</span> <span class="o">[</span> <span class="s1">&#39;type=ioemu, bridge=xenbr0&#39;</span> <span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">disk</span> <span class="o">=</span>  <span class="o">[</span>
+</span><span class='line'>                <span class="s1">&#39;phy:/dev/vg0/hvmdomu-disk,hda,w&#39;</span>,
+</span><span class='line'>                <span class="s1">&#39;file:/tmp/InstallImage.iso,hdc:cdrom,r&#39;</span>
+</span><span class='line'>        <span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nv">boot</span><span class="o">=</span><span class="s2">&quot;dc&quot;</span>
+</span><span class='line'><span class="c">#change this to &quot;cd&quot; after installation!</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">vnc</span><span class="o">=</span>1
+</span><span class='line'><span class="nv">vnclisten</span><span class="o">=</span>0.0.0.0
+</span><span class='line'><span class="nv">vncunused</span><span class="o">=</span>1
+</span><span class='line'><span class="nv">vncpasswd</span><span class="o">=</span><span class="s1">&#39;supersecret&#39;</span>
+</span><span class='line'><span class="c"># you may use a different one ;)</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="o">[</span>...<span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>start the domu,</p>
+
+<pre><code># xm create hvmdomu
+</code></pre>
+
+<p>connect with a VNC-viewer to your Dom0, Port 5900 (the next HVM DomU will bind to Port 5901, 5902, and so on)
+and perform the installation.</p>
+
+<p>After the HVM System has installed its own bootloader (usually when it requests the first reboot), change the boot sequence in your config file as commented above. Yoy may also comment out the iso image once everything is set up.</p>
+
+<p>That&#8217;s it.</p>
+
+<h2>Best practice hints</h2>
+
+<ul>
+<li>instead of xm create/shutdown/console, use abbreviations: xm crea/shut/con</li>
+<li>When using Ubuntu 12.04 both as Dom0 and DomU, hot adding and removing memory works out of the box. Nice!</li>
+<li>When using xfs as filesystem, growing Disk size without downtime is possible, too!</li>
+</ul>
+
+
+<p>If memory increasing does not have any effect, check, if the menory is present, but not registered:</p>
+
+<pre><code># grep offline /sys/devices/system/memory/*/state
+</code></pre>
+
+<p>note the numbers and activate them one by one:</p>
+
+<pre><code># echo online &gt; /sys/devices/system/memory/memory[number]/state
+</code></pre>
+
+<h3>starting DomUs on Dom0 startup</h3>
+
+<p>all DomUs that are present in /etc/xen/auto will be started directly after system startup:</p>
+
+<pre><code># mkdir /etc/xen/auto
+# cd /etc/xen/auto
+# ln -s ../&lt;name&gt; .
+</code></pre>
+
+<p>Note that we have set</p>
+
+<pre><code>XENDOMAINS_RESTORE=false
+</code></pre>
+
+<p>in /etc/default/xendomains!</p>
+
+<h3>Troubeshooting DomUs</h3>
+
+<p>Perform these tasks on the Dom0:</p>
+
+<p>This will start the DomU with attached console and lets you view the booting process. If this hangs, check the kernel messages. Exit the console with &#8220;ctrl + ]&#8221;</p>
+
+<pre><code># xm create -c myfirstdomU
+</code></pre>
+
+<p>This will attach to the console of an already started DomU. When networking is not working, you still can act on the local console to perform some commands. Exit the console with &#8220;ctrl + ]&#8221;</p>
+
+<pre><code># xm console myfirstdomU
+</code></pre>
+
+<p><em>There is no console on HVM DomUs, use VNC for diagnostics.</em></p>
+
+<p>I don&#8217;t need to explain ping, do I? If this is not working, check the networking setup:</p>
+
+<pre><code># ping &lt;DomU IP&gt; 
+</code></pre>
+
+<h4>coming up next:</h4>
+
+<p>DomU instant cloning and backup with lvm snapshots (THE perfect solution for test/staging systems)</p>
+
+<h4>recipe based on:</h4>
+
+<ul>
+<li><a href="https://help.ubuntu.com/community/XenProposed">https://help.ubuntu.com/community/XenProposed</a></li>
+<li><a href="http://wiki.debian.org/Xen">http://wiki.debian.org/Xen</a></li>
+<li>several years playing around with XEN :)</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">David Heidt</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-09T11:01:00+02:00" pubdate data-updated="true">Apr 9<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/howtos/'>howtos</a>, <a class='category' href='/blog/categories/xen/'>xen</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/" data-via="witsches" data-counturl="http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/" title="Previous Post: Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0">&laquo; Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/">My best-practice DomU setup on Ubuntu 12.04 (precise pangolin)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/09/17/setting-up-ubuntu-12-dot-04-precise-pangolin-as-xen-dom0/">Setting up Ubuntu 12.04 (precise pangolin) as XEN Dom0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/23/playing-with-nginx-manipulating-get-parameters/">playing with nginx - manipulating GET parameters</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/07/19/ssl-websocket-proxy-with-stunnel-howto/">ssl websocket proxy with stunnel howto</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/19/installing-icinga-and-pnp4nagios-on-ubuntu-12-dot-04-precise-pangolin/">installing Icinga and pnp4nagios on Ubuntu 12.04 (precise pangolin)</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/witscher">@witscher</a> on GitHub
+  
+  <script type="text/javascript">
+    $.domReady(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'witscher',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+  <h1>Latest Tweets</h1>
+  <ul id="tweets">
+    <li class="loading">Status updating...</li>
+  </ul>
+  <script type="text/javascript">
+    $.domReady(function(){
+      getTwitterFeed("witsches", 4, false);
+    });
+  </script>
+  <script src="/javascripts/twitter.js" type="text/javascript"> </script>
+  
+    <a href="http://twitter.com/witsches" class="twitter-follow-button" data-show-count="false">Follow @witsches</a>
+  
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/https://plus.google.com/u/0/112892681116962456428?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - David Heidt -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'davidheidtsblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/';
+        var disqus_url = 'http://blog.heidt.biz/blog/2013/04/09/my-best-practice-domu-setup-on-ubuntu-12-dot-04-precise-pangolin/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
